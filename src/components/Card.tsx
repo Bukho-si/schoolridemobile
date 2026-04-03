@@ -1,25 +1,48 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { View, ViewProps, StyleSheet } from 'react-native';
+import { theme } from '../theme';
 
-interface CardProps {
+interface CardProps extends ViewProps {
   children: React.ReactNode;
-  style?: ViewStyle;
+  variant?: 'base' | 'section' | 'card';
+  style?: any;
 }
 
-export const Card = ({ children, style }: CardProps) => {
-  return <View style={[styles.card, style]}>{children}</View>;
+export const Card: React.FC<CardProps> = ({ children, variant = 'card', style, ...props }) => {
+  const getBackgroundColor = () => {
+    switch (variant) {
+      case 'base': return theme.colors.surface;
+      case 'section': return theme.colors.surfaceContainerLow;
+      case 'card': return theme.colors.surfaceContainerLowest;
+      default: return theme.colors.surfaceContainerLowest;
+    }
+  };
+
+  return (
+    <View 
+      style={[
+        styles.container, 
+        { backgroundColor: getBackgroundColor() },
+        variant === 'card' ? styles.cardShadow : {},
+        style
+      ]} 
+      {...props}
+    >
+      {children}
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginVertical: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  container: {
+    borderRadius: theme.radius.xl,
+    padding: theme.spacing.lg,
   },
+  cardShadow: {
+    shadowColor: theme.shadows.ambient.shadowColor,
+    shadowOffset: theme.shadows.ambient.shadowOffset,
+    shadowOpacity: theme.shadows.ambient.shadowOpacity,
+    shadowRadius: theme.shadows.ambient.shadowRadius,
+    elevation: theme.shadows.ambient.elevation,
+  }
 });
